@@ -12,7 +12,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Snake Game")
 
 # Шрифты
-font = pygame.font.SysFont("Verdana  ", 20)
+font = pygame.font.SysFont("Verdana", 20)
 
 # Функция отрисовки шахматной сетки
 
@@ -24,11 +24,15 @@ def draw_grid_chess():
             pygame.draw.rect(
                 screen, colors[(i + j) % 2], (i * CELL, j * CELL, CELL, CELL))
 
+# Класс точки на поле
+
 
 class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+# Класс змейки
 
 
 class Snake:
@@ -48,19 +52,19 @@ class Snake:
             return False
 
         # Проверка столкновения с самим собой
-        for segment in self.body:
-            if new_x == segment.x and new_y == segment.y:
-                return False
+        if any(new_x == segment.x and new_y == segment.y for segment in self.body):
+            return False
 
         self.body.insert(0, Point(new_x, new_y))
         self.body.pop()
         return True
 
-    def grow(self):
+    def grow(self, weight):
         tail = self.body[-1]
-        self.body.append(Point(tail.x, tail.y))
-        self.score += 1
-        if self.score % 3 == 0:  # Уровень повышается каждые 3 очка
+        for _ in range(weight):
+            self.body.append(Point(tail.x, tail.y))
+        self.score += weight
+        if self.score % 3 == 0:
             self.level += 1
             self.speed += 1
 
@@ -73,14 +77,19 @@ class Snake:
 
     def check_collision(self, food):
         if self.body[0].x == food.pos.x and self.body[0].y == food.pos.y:
-            self.grow()
+            self.grow(food.weight)
             return True
         return False
+
+# Класс еды
 
 
 class Food:
     def __init__(self, snake):
         self.generate_random_position(snake)
+        # Вес еды (размер змейки при поедании)
+        self.weight = random.randint(1, 3)
+        self.timer = pygame.time.get_ticks()  # Таймер для исчезновения
 
     def generate_random_position(self, snake):
         while True:
@@ -88,10 +97,14 @@ class Food:
                              random.randint(0, (HEIGHT // CELL) - 1))
             if not any(segment.x == self.pos.x and segment.y == self.pos.y for segment in snake.body):
                 break
+        self.timer = pygame.time.get_ticks()
 
     def draw(self):
         pygame.draw.rect(screen, colorGREEN, (self.pos.x *
                          CELL, self.pos.y * CELL, CELL, CELL))
+        weight_text = font.render(str(self.weight), True, colorBLACK)
+        screen.blit(weight_text, (self.pos.x *
+                    CELL + 5, self.pos.y * CELL + 5))
 
 
 # Инициализация объектов
@@ -120,8 +133,13 @@ while running:
     if not snake.move():
         running = False  # Остановка игры при столкновении
 
+    # Проверка коллизии с едой
     if snake.check_collision(food):
-        food.generate_random_position(snake)
+        food = Food(snake)
+
+    # Проверка таймера еды (исчезает через 5 секунд)
+    if pygame.time.get_ticks() - food.timer > 5000:
+        food = Food(snake)
 
     snake.draw()
     food.draw()
