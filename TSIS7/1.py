@@ -13,12 +13,12 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Mickey Clock")
 
 # Загрузка изображения Микки
-mickey = pygame.image.load("mickey.png")
+mickey = pygame.image.load('D:/Users/User/Documents/1 КУРС/2 Семестр/PP2/Python/PP2/TSIS7/mickey.png')
 mickey = pygame.transform.scale(mickey, (300, 300))
 clock_center = (WIDTH // 2, HEIGHT // 2)
 
-minute_hand = pygame.image.load("right_hand.png")  # Стрелка минут
-second_hand = pygame.image.load("left_hand.png")  # Стрелка секунд
+minute_hand = pygame.image.load("D:/Users/User/Documents/1 КУРС/2 Семестр/PP2/Python/PP2/TSIS7/right_hand.png")  # Стрелка минут
+second_hand = pygame.image.load("D:/Users/User/Documents/1 КУРС/2 Семестр/PP2/Python/PP2/TSIS7/left_hand.png")  # Стрелка секунд
 
 
 
